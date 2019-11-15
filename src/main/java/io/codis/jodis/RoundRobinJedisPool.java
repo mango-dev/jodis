@@ -37,6 +37,14 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.google.common.io.Closeables;
+
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.cache.ChildData;
@@ -45,14 +53,6 @@ import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.common.io.Closeables;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -164,6 +164,7 @@ public class RoundRobinJedisPool implements JedisResourcePool {
                     msg.append(", no data");
                 }
                 LOG.info(msg.toString());
+                System.out.println(msg.toString());
             }
 
             @Override
@@ -212,6 +213,7 @@ public class RoundRobinJedisPool implements JedisResourcePool {
                             new JedisPool(poolConfig, host, port, connectionTimeoutMs, soTimeoutMs,
                                     password, database, clientName, false, null, null, null));
                     LOG.info("Add new proxy: " + addr);
+                    System.out.println("Add new proxy: " + addr);
                 }
                 builder.add(pool);
             } catch (Exception e) {
@@ -221,6 +223,7 @@ public class RoundRobinJedisPool implements JedisResourcePool {
         this.pools = builder.build();
         for (final PooledObject pool: addr2Pool.values()) {
             LOG.info("Remove proxy: " + pool.addr);
+            System.out.println("Remove proxy: " + pool.addr);
             jedisPoolClosingExecutor.schedule(new Runnable() {
                 @Override
                 public void run() {
